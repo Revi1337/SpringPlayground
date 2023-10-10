@@ -101,9 +101,9 @@ class StudentScoreServiceTest {
         // TODO studentPassRepository 의 findAll() 를 호출한다면 무조건 아래 명시한 3개의 StudentPass 를 리턴해줄거야라는 것을 정의하는 "명령" 이다.
         //  when().thenReturn() 구문을 사용하면 정의한 리턴값을 고정해서 사용할 수 있게된다.
         String givenTestExam = "testexam";
-        StudentPass expectStudent1 = StudentPass.builder().id(1L).studentName("revi1337").exam(givenTestExam).avgScore(70.0).build();
-        StudentPass expectStudent2 = StudentPass.builder().id(2L).studentName("test").exam(givenTestExam).avgScore(80.0).build();
-        StudentPass notExpectStudent3 = StudentPass.builder().id(3L).studentName("iamnot").exam("secondexam").avgScore(90.0).build();
+        StudentPass expectStudent1 = StudentPassFixture.create("revi1337", givenTestExam);
+        StudentPass expectStudent2 =  StudentPassFixture.create("test", givenTestExam);
+        StudentPass notExpectStudent3 = StudentPassFixture.create("iamnot", "secondexam");
         when(studentPassRepository.findAll()).thenReturn(List.of(
                 expectStudent1,
                 expectStudent2,
@@ -125,9 +125,9 @@ class StudentScoreServiceTest {
         // TODO studentPassRepository 의 findAll() 를 호출한다면 무조건 아래 명시한 3개의 StudentPass 를 리턴해줄거야라는 것을 정의하는 "명령" 이다.
         //  when().thenReturn() 구문을 사용하면 정의한 리턴값을 고정해서 사용할 수 있게 된다.
         String givenTestExam = "testexam";
-        StudentFail expectStudent1 = StudentFail.builder().id(1L).studentName("revi1337").exam(givenTestExam).avgScore(50.0).build();
-        StudentFail expectStudent2 = StudentFail.builder().id(2L).studentName("test").exam(givenTestExam).avgScore(45.0).build();
-        StudentFail notExpectStudent3 = StudentFail.builder().id(3L).studentName("iamnot").exam("secondexam").avgScore(35.0).build();
+        StudentFail expectStudent1 = StudentFailFixture.create("revi1337", givenTestExam);
+        StudentFail expectStudent2 = StudentFailFixture.create("test", givenTestExam);
+        StudentFail notExpectStudent3 = StudentFailFixture.create("iamnot", "secondexam");
         when(studentFailRepository.findAll()).thenReturn(List.of(
                 expectStudent1,
                 expectStudent2,
@@ -151,17 +151,7 @@ class StudentScoreServiceTest {
     public void checkArgumentTest() {
         // given (평균 점수가 60 점 이상인 경우 - 해당 상황들이 주어졌을 때)
         StudentScore expectedStudentScore = StudentScoreTestDataBuilder.passed().build();
-        StudentPass expectedStudentPass = StudentPass.builder()
-                .studentName(expectedStudentScore.getStudentName())
-                .exam(expectedStudentScore.getExam())
-                .avgScore(
-                        new MyCalculator(0.0)
-                                .add(expectedStudentScore.getKorScore().doubleValue())
-                                .add(expectedStudentScore.getEnglishScore().doubleValue())
-                                .add(expectedStudentScore.getMathScore().doubleValue())
-                                .divide(3.0)
-                                .getResult()
-                ).build();
+        StudentPass expectedStudentPass = StudentPassFixture.create(expectedStudentScore);
 
         ArgumentCaptor<StudentScore> studentScoreArgumentCaptor = ArgumentCaptor.forClass(StudentScore.class);
         ArgumentCaptor<StudentPass> studentPassArgumentCaptor = ArgumentCaptor.forClass(StudentPass.class);
@@ -202,17 +192,7 @@ class StudentScoreServiceTest {
     public void checkArgumentTest2() {
         // given (평균 점수가 60 점 미만인 경우 - 해당 상황들이 주어졌을 때)
         StudentScore expectedStudentScore = StudentScoreFixture.failed();
-        StudentFail expectedStudentFail = StudentFail.builder()
-                .studentName(expectedStudentScore.getStudentName())
-                .exam(expectedStudentScore.getExam())
-                .avgScore(
-                        new MyCalculator(0.0)
-                                .add(expectedStudentScore.getKorScore().doubleValue())
-                                .add(expectedStudentScore.getEnglishScore().doubleValue())
-                                .add(expectedStudentScore.getMathScore().doubleValue())
-                                .divide(3.0)
-                                .getResult()
-                ).build();
+        StudentFail expectedStudentFail = StudentFailFixture.create(expectedStudentScore);
         ArgumentCaptor<StudentScore> studentScoreArgumentCaptor = ArgumentCaptor.forClass(StudentScore.class);
         ArgumentCaptor<StudentFail> studentFailArgumentCaptor = ArgumentCaptor.forClass(StudentFail.class);
 
