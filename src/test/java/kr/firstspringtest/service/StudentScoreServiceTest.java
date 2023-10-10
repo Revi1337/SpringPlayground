@@ -3,10 +3,7 @@ package kr.firstspringtest.service;
 import kr.firstspringtest.MyCalculator;
 import kr.firstspringtest.controller.response.ExamFailStudentResponse;
 import kr.firstspringtest.controller.response.ExamPassStudentResponse;
-import kr.firstspringtest.model.StudentFail;
-import kr.firstspringtest.model.StudentPass;
-import kr.firstspringtest.model.StudentScore;
-import kr.firstspringtest.model.StudentScoreTestDataBuilder;
+import kr.firstspringtest.model.*;
 import kr.firstspringtest.repository.StudentFailRepository;
 import kr.firstspringtest.repository.StudentPassRepository;
 import kr.firstspringtest.repository.StudentScoreRepository;
@@ -204,28 +201,15 @@ class StudentScoreServiceTest {
     """)
     public void checkArgumentTest2() {
         // given (평균 점수가 60 점 미만인 경우 - 해당 상황들이 주어졌을 때)
-        String givenStudentName = "revi1337";
-        String givenExam = "textexam";
-        Integer givenKorScore = 40;
-        Integer givenEnglishScore = 40;
-        Integer givenMathScore = 60;
-
-        StudentScore expectedStudentScore = StudentScore.builder()
-                .studentName(givenStudentName)
-                .exam(givenExam)
-                .korScore(givenKorScore)
-                .englishScore(givenEnglishScore)
-                .mathScore(givenMathScore)
-                .build();
-
+        StudentScore expectedStudentScore = StudentScoreFixture.failed();
         StudentFail expectedStudentFail = StudentFail.builder()
-                .studentName(givenStudentName)
-                .exam(givenExam)
+                .studentName(expectedStudentScore.getStudentName())
+                .exam(expectedStudentScore.getExam())
                 .avgScore(
                         new MyCalculator(0.0)
-                                .add(givenKorScore.doubleValue())
-                                .add(givenEnglishScore.doubleValue())
-                                .add(givenMathScore.doubleValue())
+                                .add(expectedStudentScore.getKorScore().doubleValue())
+                                .add(expectedStudentScore.getEnglishScore().doubleValue())
+                                .add(expectedStudentScore.getMathScore().doubleValue())
                                 .divide(3.0)
                                 .getResult()
                 ).build();
@@ -234,7 +218,13 @@ class StudentScoreServiceTest {
 
 
         // when (saveScore 를 호출했을 때)
-        studentScoreService.saveScore(givenStudentName, givenExam, givenKorScore, givenEnglishScore, givenMathScore);
+        studentScoreService.saveScore(
+                expectedStudentScore.getStudentName(),
+                expectedStudentScore.getExam(),
+                expectedStudentScore.getKorScore(),
+                expectedStudentScore.getEnglishScore(),
+                expectedStudentScore.getMathScore()
+        );
 
         // then (studentScoreRepository, studentPassRepository, studentFailRepository 의 동작 및 행동을 검증한다. --> BDD)
         Mockito.verify(studentScoreRepository, Mockito.times(1)).save(studentScoreArgumentCaptor.capture());
